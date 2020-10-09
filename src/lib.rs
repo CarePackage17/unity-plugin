@@ -1,16 +1,17 @@
-#[cfg(test)]
-mod tests {
-    #[test]
-    fn it_works() {
-        assert_eq!(2 + 2, 4);
-    }
-}
+// #[cfg(test)]
+// mod tests {
+//     #[test]
+//     fn it_works() {
+//         assert_eq!(2 + 2, 4);
+//     }
+// }
 
-pub mod unity_interface;
 pub mod unity_graphics;
+pub mod unity_interface;
+pub mod unity_xr_trace;
 
+use crate::unity_graphics::{IUnityGraphics, UnityGfxDeviceEventType};
 use crate::unity_interface::IUnityInterfaces;
-use crate::unity_graphics::IUnityGraphics;
 
 #[no_mangle]
 pub unsafe extern "system" fn UnityPluginLoad(unity_interfaces: *const IUnityInterfaces) {
@@ -18,13 +19,16 @@ pub unsafe extern "system" fn UnityPluginLoad(unity_interfaces: *const IUnityInt
 
     //https://stackoverflow.com/a/27994682
     let get_iface = (*unity_interfaces).get_interface;
-    let gfx_interface = get_iface(IUnityGraphics::GUID);
+    let gfx_interface_ptr = get_iface(IUnityGraphics::GUID);
 
-    if gfx_interface != std::ptr::null() {
+    if gfx_interface_ptr != std::ptr::null() {
         println!("Got IUnityGraphics!");
-
-        let get_renderer = (*(gfx_interface as *const IUnityGraphics)).get_renderer;
+        let gfx_interface = &*(gfx_interface_ptr as *const IUnityGraphics);
+        let get_renderer = gfx_interface.get_renderer;
         let renderer = get_renderer();
+
+        let register_device_event_callback = gfx_interface.register_device_event_callback;
+        register_device_event_callback(on_graphics_device_event);
 
         //pity that this doesn't print to debugger console :/
         eprintln!("Curernt renderer: {:?}", renderer);
@@ -34,4 +38,9 @@ pub unsafe extern "system" fn UnityPluginLoad(unity_interfaces: *const IUnityInt
 #[no_mangle]
 pub unsafe extern "system" fn UnityPluginUnload() {
     println!("I'm never gonna be called from the editor!");
+}
+
+unsafe extern "system" fn on_graphics_device_event(event_type: UnityGfxDeviceEventType) {
+    //interestingly this gets called multiple times when we exit the editor. but it works :)
+    println!("We got a graphics device event: {:?}", event_type);
 }

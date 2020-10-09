@@ -4,7 +4,7 @@ pub struct UnityInterfaceGUID {
 }
 
 // In C this is typedef to void.
-pub struct IUnityInterface {}
+pub struct IUnityInterface;
 
 pub struct IUnityInterfaces {
     // Returns an interface matching the guid.
@@ -21,3 +21,7 @@ pub struct IUnityInterfaces {
     pub register_interface_split:
         unsafe extern "system" fn(guid_high: u64, guid_low: u64, *mut IUnityInterface),
 }
+
+pub struct RenderSurfaceBase;
+pub type UnityRenderBuffer = *const RenderSurfaceBase;
+pub type UnityTextureID = u32;
