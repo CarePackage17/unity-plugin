@@ -1,3 +1,5 @@
+use crate::unity_interface::UnityInterfaceGUID;
+
 #[allow(non_camel_case_types)]
 #[repr(C)]
 #[derive(Debug)]
@@ -22,4 +24,13 @@ pub struct IUnityXRTrace {
     //this is interesting. for the unity headers, on x86 this would use stdcall, which doesn't 
     //support variadic functions (because the callee cleans up I think). So in theory it'd crash, right?
     pub trace: unsafe extern "C" fn(log_type: XRLogType, *const std::os::raw::c_char, ...),
+}
+
+impl IUnityXRTrace {
+    pub const GUID_HIGH: u64 = 0xC633A7C9398B4A95;
+    pub const GUID_LOW: u64 = 0xC225399ED5A2328F;
+    pub const GUID: UnityInterfaceGUID = UnityInterfaceGUID {
+        high: Self::GUID_HIGH,
+        low: Self::GUID_LOW,
+    };
 }

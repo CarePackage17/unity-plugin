@@ -12,6 +12,7 @@ pub mod unity_xr_trace;
 
 use crate::unity_graphics::{IUnityGraphics, UnityGfxDeviceEventType};
 use crate::unity_interface::IUnityInterfaces;
+use crate::unity_xr_trace::IUnityXRTrace;
 
 #[no_mangle]
 pub unsafe extern "system" fn UnityPluginLoad(unity_interfaces: *const IUnityInterfaces) {
@@ -32,6 +33,11 @@ pub unsafe extern "system" fn UnityPluginLoad(unity_interfaces: *const IUnityInt
 
         //pity that this doesn't print to debugger console :/
         eprintln!("Curernt renderer: {:?}", renderer);
+    }
+
+    let xr_trace_ptr = get_iface(IUnityXRTrace::GUID);
+    if xr_trace_ptr != std::ptr::null() {
+        println!("Got IUnityXRTrace!");
     }
 }
 
