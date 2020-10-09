@@ -12,7 +12,7 @@ pub mod unity_xr_trace;
 
 use crate::unity_graphics::{IUnityGraphics, UnityGfxDeviceEventType};
 use crate::unity_interface::IUnityInterfaces;
-use crate::unity_xr_trace::IUnityXRTrace;
+use crate::unity_xr_trace::{IUnityXRTrace, XRLogType};
 
 #[no_mangle]
 pub unsafe extern "system" fn UnityPluginLoad(unity_interfaces: *const IUnityInterfaces) {
@@ -32,12 +32,19 @@ pub unsafe extern "system" fn UnityPluginLoad(unity_interfaces: *const IUnityInt
         register_device_event_callback(on_graphics_device_event);
 
         //pity that this doesn't print to debugger console :/
-        eprintln!("Curernt renderer: {:?}", renderer);
+        //but nice, it prints to the editor log, how cool is that! println! does too :)
+        eprintln!("Current renderer: {:?}", renderer);
     }
 
     let xr_trace_ptr = get_iface(IUnityXRTrace::GUID);
     if xr_trace_ptr != std::ptr::null() {
         println!("Got IUnityXRTrace!");
+        //I think we could safely make this Copy since it's just a bunch of fn pointers, right?
+        let xr_trace = &*(xr_trace_ptr as *const IUnityXRTrace);
+        let trace = xr_trace.trace;
+
+        let message = std::ffi::CString::new("Yo from XRTrace").expect("something exploded");
+        trace(XRLogType::kXRLogTypeLog, message.as_ptr());
     }
 }
 
