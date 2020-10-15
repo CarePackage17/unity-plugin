@@ -4,8 +4,11 @@ pub struct UnityInterfaceGUID {
 }
 
 // In C this is typedef to void.
+#[derive(Copy, Clone)]
 pub struct IUnityInterface;
 
+#[repr(C)]
+#[derive(Copy, Clone)]
 pub struct IUnityInterfaces {
     // Returns an interface matching the guid.
     // Returns nullptr if the given interface is unavailable in the active Unity runtime.

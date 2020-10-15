@@ -34,6 +34,8 @@ pub enum UnityGfxDeviceEventType {
 type IUnityGraphicsDeviceEventCallback =
     unsafe extern "system" fn(event_type: UnityGfxDeviceEventType);
 
+#[repr(C)]
+#[derive(Copy, Clone)]
 pub struct IUnityGraphics {
     pub get_renderer: unsafe extern "system" fn() -> UnityGfxRenderer,
     pub register_device_event_callback:

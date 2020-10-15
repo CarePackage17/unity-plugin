@@ -7,6 +7,7 @@
 // }
 
 pub mod unity_graphics;
+pub mod unity_graphics_d3d11;
 pub mod unity_interface;
 pub mod unity_xr_trace;
 
@@ -24,7 +25,7 @@ pub unsafe extern "system" fn UnityPluginLoad(unity_interfaces: *const IUnityInt
 
     if gfx_interface_ptr != std::ptr::null() {
         println!("Got IUnityGraphics!");
-        let gfx_interface = &*(gfx_interface_ptr as *const IUnityGraphics);
+        let gfx_interface = *(gfx_interface_ptr as *const IUnityGraphics);
         let get_renderer = gfx_interface.get_renderer;
         let renderer = get_renderer();
 
@@ -40,7 +41,7 @@ pub unsafe extern "system" fn UnityPluginLoad(unity_interfaces: *const IUnityInt
     if xr_trace_ptr != std::ptr::null() {
         println!("Got IUnityXRTrace!");
         //I think we could safely make this Copy since it's just a bunch of fn pointers, right?
-        let xr_trace = &*(xr_trace_ptr as *const IUnityXRTrace);
+        let xr_trace = *(xr_trace_ptr as *const IUnityXRTrace);
         let trace = xr_trace.trace;
 
         let message = std::ffi::CString::new("Yo from XRTrace").expect("something exploded");
