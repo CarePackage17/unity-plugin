@@ -54,3 +54,7 @@ impl IUnityGraphics {
         low: Self::GUID_LOW,
     };
 }
+
+pub type UnityRenderingEvent = unsafe extern "system" fn(event_id: i32);
+pub type UnityRenderingEventAndData =
+    unsafe extern "system" fn(event_id: i32, data: *const std::os::raw::c_void);

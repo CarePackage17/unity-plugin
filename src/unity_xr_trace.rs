@@ -26,7 +26,8 @@ pub struct IUnityXRTrace {
     //this is interesting. for the unity headers, on x86 this would use stdcall, which doesn't
     //support variadic functions (because the callee cleans up I think). So in theory it'd crash, right?
     //Nope, according to MS docs the compiler ignores stdcall if the function has varargs and makes it 
-    //cdecl instead. I wonder what rustc does. Probably same.
+    //cdecl instead. I wonder what rustc does. 
+    //It complains and says "use cdecl". Cool.
     pub trace: unsafe extern "C" fn(log_type: XRLogType, *const std::os::raw::c_char, ...),
 }
 

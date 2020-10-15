@@ -14,6 +14,11 @@ pub mod unity_xr_trace;
 use crate::unity_graphics::{IUnityGraphics, UnityGfxDeviceEventType};
 use crate::unity_interface::IUnityInterfaces;
 use crate::unity_xr_trace::{IUnityXRTrace, XRLogType};
+use crate::unity_graphics_d3d11::IUnityGraphicsD3D11;
+
+//very much unsafe: https://doc.rust-lang.org/reference/items/static-items.html#mutable-statics
+//we'll assign to this in UnityPluginLoad and use it later in a rendering call.
+static mut D3D11_GFX: Option<IUnityGraphicsD3D11> = None;
 
 #[no_mangle]
 pub unsafe extern "system" fn UnityPluginLoad(unity_interfaces: *const IUnityInterfaces) {
@@ -47,11 +52,32 @@ pub unsafe extern "system" fn UnityPluginLoad(unity_interfaces: *const IUnityInt
         let message = std::ffi::CString::new("Yo from XRTrace").expect("something exploded");
         trace(XRLogType::kXRLogTypeLog, message.as_ptr());
     }
+
+    let d3d_gfx_ptr = get_iface(IUnityGraphicsD3D11::GUID);
+    if d3d_gfx_ptr != std::ptr::null() {
+        println!("Got IUnityGraphicsD3D11!");
+        let d3d_gfx = *(d3d_gfx_ptr as *const IUnityGraphicsD3D11);
+        
+        //so now we wanna save this so we can later use it from the callback that
+        //is called when we do GL.IssuePluginEvent in C#.
+        D3D11_GFX = Some(d3d_gfx);
+    }
 }
 
 #[no_mangle]
 pub unsafe extern "system" fn UnityPluginUnload() {
     println!("I'm never gonna be called from the editor!");
+}
+
+#[no_mangle]
+pub unsafe extern "system" fn DoGraphicsStuff(_event_id: i32) {
+    if let Some(d3d11) = D3D11_GFX {
+        let get_device = d3d11.get_device;
+
+        let d3d11_device = get_device();
+        // this needs *mut *mut ID3D11DeviceContext and I'm tired rn.
+        // let context = d3d11_device.as_ref().unwrap().GetImmediateContext();
+    }
 }
 
 unsafe extern "system" fn on_graphics_device_event(event_type: UnityGfxDeviceEventType) {
