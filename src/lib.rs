@@ -69,6 +69,9 @@ pub unsafe extern "system" fn DoGraphicsStuff() -> UnityRenderingEvent {
 }
 
 unsafe extern "system" fn do_graphics_stuff(_event_id: i32) {
+    //We wanted this to clear only a portion of the view, but ClearRenderTargetView overwrites the whole thing.
+    //There is ID3D11DeviceContext1::ClearView which takes a rect, so we could try using that.
+    
     if let Some(d3d11) = D3D11_GFX {
         let get_device = d3d11.get_device;
 
@@ -90,7 +93,7 @@ unsafe extern "system" fn do_graphics_stuff(_event_id: i32) {
 
         // save old viewport
         let mut old_viewport: D3D11_VIEWPORT = std::mem::zeroed();
-        let mut num_viewports: u32 = 0;
+        let mut num_viewports: u32 = 1;
         d3d11_context.RSGetViewports(&mut num_viewports, &mut old_viewport);
 
         //set new viewport. Let's make it a 100px square.
