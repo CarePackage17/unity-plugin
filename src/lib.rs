@@ -1,13 +1,8 @@
-pub mod unity_graphics;
-pub mod unity_graphics_d3d11;
-pub mod unity_interface;
-pub mod unity_xr_trace;
-
-use crate::unity_graphics::{IUnityGraphics, UnityGfxDeviceEventType, UnityRenderingEvent};
-use crate::unity_graphics_d3d11::IUnityGraphicsD3D11;
-use crate::unity_interface::IUnityInterfaces;
-use crate::unity_xr_trace::{IUnityXRTrace, XRLogType};
-use winapi::um::d3d11::{ID3D11RenderTargetView, D3D11_VIEWPORT};
+use unity3d_sys::unity_graphics::{IUnityGraphics, UnityGfxDeviceEventType, UnityRenderingEvent};
+use unity3d_sys::unity_graphics_d3d11::IUnityGraphicsD3D11;
+use unity3d_sys::unity_interface::IUnityInterfaces;
+use unity3d_sys::unity_xr_trace::{IUnityXRTrace, XRLogType};
+use unity3d_sys::winapi::um::d3d11::{ID3D11DeviceContext, ID3D11RenderTargetView, D3D11_VIEWPORT};
 
 //very much unsafe: https://doc.rust-lang.org/reference/items/static-items.html#mutable-statics
 //we'll assign to this in UnityPluginLoad and use it later in a rendering call.
@@ -71,12 +66,12 @@ pub unsafe extern "system" fn DoGraphicsStuff() -> UnityRenderingEvent {
 unsafe extern "system" fn do_graphics_stuff(_event_id: i32) {
     //We wanted this to clear only a portion of the view, but ClearRenderTargetView overwrites the whole thing.
     //There is ID3D11DeviceContext1::ClearView which takes a rect, so we could try using that.
-    
+
     if let Some(d3d11) = D3D11_GFX {
         let get_device = d3d11.get_device;
 
         let d3d11_device = get_device();
-        let mut d3d11_context: *mut winapi::um::d3d11::ID3D11DeviceContext = std::ptr::null_mut();
+        let mut d3d11_context: *mut ID3D11DeviceContext = std::ptr::null_mut();
         // this needs *mut *mut ID3D11DeviceContext and I'm tired rn.
         d3d11_device
             .as_ref()
@@ -115,7 +110,7 @@ unsafe extern "system" fn do_graphics_stuff(_event_id: i32) {
         //this seems to be it: https://docs.microsoft.com/en-us/windows/win32/api/d3d11/nf-d3d11-id3d11devicecontext-omgetrendertargets
 
         let mut render_target_view_ptr: *mut ID3D11RenderTargetView = std::ptr::null_mut();
-        let color = [ 0.5, 0.0, 0.0, 1.0f32];
+        let color = [0.5, 0.0, 0.0, 1.0f32];
         d3d11_context.OMGetRenderTargets(1, &mut render_target_view_ptr, std::ptr::null_mut());
         d3d11_context.ClearRenderTargetView(render_target_view_ptr, &color);
 
