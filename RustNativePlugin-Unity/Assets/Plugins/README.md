@@ -1,3 +1,3 @@
 ## Plugin Directory
 
-Put the compiled plugin DLL here.
+Put the compiled plugin DLL in here.
