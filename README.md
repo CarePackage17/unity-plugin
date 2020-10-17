@@ -4,7 +4,7 @@ This showcases a [Unity Native Plugin](https://docs.unity3d.com/Manual/NativePlu
 
 ## Code Organization
 `unity3d-sys` contains raw, unsafe bindings to the native Unity API.  
-`src/lib.rs` uses those to talk to Unity and clear the screen with a red color.
+`src/lib.rs` uses those to talk to Unity and clear the screen with a red color.  
 `RustNativePlugin-Unity` contains a sample Unity project that uses the plugin.
 
 ## Building
