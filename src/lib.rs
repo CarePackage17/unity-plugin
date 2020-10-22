@@ -1,6 +1,6 @@
 use unity3d_sys::unity_graphics::{IUnityGraphics, UnityGfxDeviceEventType, UnityRenderingEvent};
 use unity3d_sys::unity_graphics_d3d11::IUnityGraphicsD3D11;
-use unity3d_sys::unity_interface::IUnityInterfaces;
+use unity3d_sys::unity_interface::{IUnityInterfaces, Interface};
 use unity3d_sys::unity_xr_trace::{IUnityXRTrace, XRLogType};
 use unity3d_sys::winapi::um::d3d11::{ID3D11DeviceContext, ID3D11RenderTargetView, D3D11_VIEWPORT};
 
@@ -13,7 +13,7 @@ pub unsafe extern "system" fn UnityPluginLoad(unity_interfaces: *const IUnityInt
     println!("Heyo, I'm a rust function!");
 
     //https://stackoverflow.com/a/27994682
-    let get_iface = (*unity_interfaces).get_interface;
+    let get_iface = (*unity_interfaces).get_interface_fn;
     let gfx_interface_ptr = get_iface(IUnityGraphics::GUID);
 
     if gfx_interface_ptr != std::ptr::null() {

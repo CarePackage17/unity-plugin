@@ -1,4 +1,4 @@
-use crate::unity_interface::UnityInterfaceGUID;
+use crate::unity_interface::{Interface, UnityInterfaceGUID};
 
 #[allow(non_camel_case_types)]
 #[repr(C)]
@@ -45,11 +45,11 @@ pub struct IUnityGraphics {
     pub reserve_event_id_range: unsafe extern "system" fn(count: i32) -> i32,
 }
 
-impl IUnityGraphics {
+impl Interface for IUnityGraphics {
     //this is seriously cool. It looks so nice at the call site and works for both split and regular fns :)
-    pub const GUID_HIGH: u64 = 0x7CBA0A9CA4DDB544;
-    pub const GUID_LOW: u64 = 0x8C5AD4926EB17B11;
-    pub const GUID: UnityInterfaceGUID = UnityInterfaceGUID {
+    const GUID_HIGH: u64 = 0x7CBA0A9CA4DDB544;
+    const GUID_LOW: u64 = 0x8C5AD4926EB17B11;
+    const GUID: UnityInterfaceGUID = UnityInterfaceGUID {
         high: Self::GUID_HIGH,
         low: Self::GUID_LOW,
     };
