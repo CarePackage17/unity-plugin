@@ -12,23 +12,24 @@ static mut D3D11_GFX: Option<IUnityGraphicsD3D11> = None;
 pub unsafe extern "system" fn UnityPluginLoad(unity_interfaces: *const IUnityInterfaces) {
     println!("Heyo, I'm a rust function!");
 
-    //https://stackoverflow.com/a/27994682
-    let get_iface = (*unity_interfaces).get_interface_fn;
-    let gfx_interface_ptr = get_iface(IUnityGraphics::GUID);
+    let unity = IUnityInterfaces::from_raw(unity_interfaces);
+    let graphics = unity.get_interface::<IUnityGraphics>();
 
-    if gfx_interface_ptr != std::ptr::null() {
+    if let Some(graphics) = graphics {
         println!("Got IUnityGraphics!");
-        let gfx_interface = *(gfx_interface_ptr as *const IUnityGraphics);
-        let get_renderer = gfx_interface.get_renderer;
+        let get_renderer = graphics.get_renderer;
         let renderer = get_renderer();
 
-        let register_device_event_callback = gfx_interface.register_device_event_callback;
+        let register_device_event_callback = graphics.register_device_event_callback;
         register_device_event_callback(on_graphics_device_event);
 
         //pity that this doesn't print to debugger console :/
         //but nice, it prints to the editor log, how cool is that! println! does too :)
         eprintln!("Current renderer: {:?}", renderer);
     }
+
+    //https://stackoverflow.com/a/27994682
+    let get_iface = (*unity_interfaces).get_interface_fn;
 
     let xr_trace_ptr = get_iface(IUnityXRTrace::GUID);
     if xr_trace_ptr != std::ptr::null() {

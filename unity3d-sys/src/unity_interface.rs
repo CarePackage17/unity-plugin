@@ -39,8 +39,8 @@ pub struct IUnityInterfaces {
 impl IUnityInterfaces {
     // this should be safe because Unity says if the interface doesn't exist, it'll return nullptr.
     // Otherwise it'll be a valid opaque pointer.
-    pub fn get_interface<T: Interface>(&self, guid: UnityInterfaceGUID) -> Option<T> {
-        let interface_ptr = unsafe { (self.get_interface_fn)(guid) };
+    pub fn get_interface<T: Interface>(&self) -> Option<T> {
+        let interface_ptr = unsafe { (self.get_interface_fn)(T::GUID) };
         if interface_ptr == std::ptr::null() {
             None
         } else {
