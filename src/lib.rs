@@ -67,18 +67,29 @@ pub unsafe extern "system" fn DoGraphicsStuff() -> UnityRenderingEvent {
     do_graphics_stuff
 }
 
-//This one gets called for low level rendering events.
+//This one gets called for low level rendering events, no matter how your plugin is called.
+//The GfxPlugin* prefix is only needed for preloading. More info:
+//https://docs.unity3d.com/Manual/LowLevelNativePluginRenderingExtensions.html
 #[no_mangle]
 pub unsafe extern "system" fn UnityRenderingExtEvent(
     event: UnityRenderingExtEventType,
-    data: std::os::raw::c_void,
+    _data: *mut std::os::raw::c_void,
 ) {
-    //I wonder how this works.
+    match event {
+        UnityRenderingExtEventType::BeforeDrawCall => {
+            //transmute data to UnityRenderingExtBeforeDrawCallParams
+        }
+        UnityRenderingExtEventType::AfterDrawCall => {
+            //there doesn't seem to be data but we can run code here.
+        }
+        _ => {}
+    }
+    // println!("UnityRenderingExtEvent called with event type {:?}", event);
 }
 
 //This one gets called for low level rendering queries.
 #[no_mangle]
-pub unsafe extern "system" fn UnityRenderingExtQuery(query: UnityRenderingExtQueryType) {
+pub unsafe extern "system" fn UnityRenderingExtQuery(_query: UnityRenderingExtQueryType) {
     //do something!
 }
 
