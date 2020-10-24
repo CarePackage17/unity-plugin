@@ -5,19 +5,19 @@ use crate::unity_interface::{Interface, UnityInterfaceGUID};
 #[derive(Debug)]
 pub enum XRLogType {
     /// LogType used for Errors.
-    kXRLogTypeError = 0,
+    Error = 0,
     /// LogType used for Asserts. (These indicate an error inside Unity itself.)
-    kXRLogTypeAssert = 1,
+    Assert = 1,
     /// LogType used for Warnings.
-    kXRLogTypeWarning = 2,
+    Warning = 2,
     /// LogType used for regular log messages.
-    kXRLogTypeLog = 3,
+    Log = 3,
     /// LogType used for Exceptions.
-    kXRLogTypeException = 4,
+    Exception = 4,
     /// LogType used for Debug.
-    kXRLogTypeDebug = 5,
+    Debug = 5,
     ///
-    kXRLogTypeNumLevels,
+    NumLevels,
 }
 
 #[repr(C)]

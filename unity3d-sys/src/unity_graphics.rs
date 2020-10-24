@@ -4,31 +4,31 @@ use crate::unity_interface::{Interface, UnityInterfaceGUID};
 #[repr(C)]
 #[derive(Debug)]
 pub enum UnityGfxRenderer {
-    //kUnityGfxRendererOpenGL            =  0, // Legacy OpenGL, removed
-    //kUnityGfxRendererD3D9              =  1, // Direct3D 9, removed
-    kUnityGfxRendererD3D11 = 2,       // Direct3D 11
-    kUnityGfxRendererNull = 4,        // "null" device (used in batch mode)
-    kUnityGfxRendererOpenGLES20 = 8,  // OpenGL ES 2.0
-    kUnityGfxRendererOpenGLES30 = 11, // OpenGL ES 3.0
-    //kUnityGfxRendererGXM               = 12, // PlayStation Vita, removed
-    kUnityGfxRendererPS4 = 13,          // PlayStation 4
-    kUnityGfxRendererXboxOne = 14,      // Xbox One
-    kUnityGfxRendererMetal = 16,        // iOS Metal
-    kUnityGfxRendererOpenGLCore = 17,   // OpenGL core
-    kUnityGfxRendererD3D12 = 18,        // Direct3D 12
-    kUnityGfxRendererVulkan = 21,       // Vulkan
-    kUnityGfxRendererNvn = 22,          // Nintendo Switch NVN API
-    kUnityGfxRendererXboxOneD3D12 = 23, // MS XboxOne Direct3D 12
+    //OpenGL            =  0, // Legacy OpenGL, removed
+    //D3D9              =  1, // Direct3D 9, removed
+    D3D11 = 2,       // Direct3D 11
+    Null = 4,        // "null" device (used in batch mode)
+    OpenGLES20 = 8,  // OpenGL ES 2.0
+    OpenGLES30 = 11, // OpenGL ES 3.0
+    //GXM               = 12, // PlayStation Vita, removed
+    PS4 = 13,          // PlayStation 4
+    XboxOne = 14,      // Xbox One
+    Metal = 16,        // iOS Metal
+    OpenGLCore = 17,   // OpenGL core
+    D3D12 = 18,        // Direct3D 12
+    Vulkan = 21,       // Vulkan
+    Nvn = 22,          // Nintendo Switch NVN API
+    XboxOneD3D12 = 23, // MS XboxOne Direct3D 12
 }
 
 #[allow(non_camel_case_types)]
 #[repr(C)]
 #[derive(Debug)]
 pub enum UnityGfxDeviceEventType {
-    kUnityGfxDeviceEventInitialize = 0,
-    kUnityGfxDeviceEventShutdown = 1,
-    kUnityGfxDeviceEventBeforeReset = 2,
-    kUnityGfxDeviceEventAfterReset = 3,
+    Initialize = 0,
+    Shutdown = 1,
+    BeforeReset = 2,
+    AfterReset = 3,
 }
 
 type IUnityGraphicsDeviceEventCallback =

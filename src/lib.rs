@@ -41,7 +41,7 @@ pub unsafe extern "system" fn UnityPluginLoad(unity_interfaces: *const IUnityInt
         let trace_fn = xr_trace.trace;
 
         let message = std::ffi::CString::new("Yo from XRTrace").expect("something exploded");
-        trace_fn(XRLogType::kXRLogTypeLog, message.as_ptr());
+        trace_fn(XRLogType::Log, message.as_ptr());
     }
 
     let d3d_gfx = unity.get_interface::<IUnityGraphicsD3D11>();
