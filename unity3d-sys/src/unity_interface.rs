@@ -9,11 +9,11 @@ pub struct UnityInterfaceGUID {
 #[derive(Copy, Clone)]
 pub struct IUnityInterface;
 
-//Alright, let's use this as a marker trait to limit the amount of types that
-//can be returned from get_interface. Or actually, we could let this trait hold the
-//interface guid. Neat.
 //Also, I think we can assume it's just going to be bags of function pointers, right?
 //So let's make it a subtrait of copy.
+//Not sure if we can assume that. A Unity interface can be just about anything we pass to
+//register_interface (it's just a pointer). I think it's safe to assume that all builtin
+//ones are just function pointers, but theoretically they could be any data.
 pub trait Interface: Copy {
     const GUID_LOW: u64;
     const GUID_HIGH: u64;
@@ -55,6 +55,13 @@ impl IUnityInterfaces {
             Some(interface)
         }
     }
+
+    //how would a safe register_interface look like? It kinda needs to take care of lifetimes, doesn't it?
+    //otherwise we could take a pointer to a temporary, register that but then have a dangling pointer
+    //after the temp variable is gone. I wonder if there's a way to prevent that.
+    //Maybe a wrapper that calls unregister? Wait, there is no unregister...maybe require static lifetime?
+    //I wonder how other people do this kind of "userdata" pattern. I'm sure there's some code out there
+    //that already solved this.
 
     //I'm not sure if we can ever verify safety since somebody can always pass a
     //garbage pointer...so let's leave it unsafe for now.

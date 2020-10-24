@@ -1,8 +1,14 @@
-use unity3d_sys::unity_graphics::{IUnityGraphics, UnityGfxDeviceEventType, UnityRenderingEvent};
-use unity3d_sys::unity_graphics_d3d11::IUnityGraphicsD3D11;
 use unity3d_sys::unity_interface::{IUnityInterface, IUnityInterfaces, UnityInterfaceGUID};
 use unity3d_sys::unity_xr_trace::{IUnityXRTrace, XRLogType};
 use unity3d_sys::winapi::um::d3d11::{ID3D11DeviceContext, ID3D11RenderTargetView, D3D11_VIEWPORT};
+use unity3d_sys::{
+    unity_graphics::{IUnityGraphics, UnityGfxDeviceEventType, UnityRenderingEvent},
+    unity_rendering_extensions::UnityRenderingExtEventType,
+};
+use unity3d_sys::{
+    unity_graphics_d3d11::IUnityGraphicsD3D11,
+    unity_rendering_extensions::UnityRenderingExtQueryType,
+};
 
 //very much unsafe: https://doc.rust-lang.org/reference/items/static-items.html#mutable-statics
 //we'll assign to this in UnityPluginLoad and use it later in a rendering call.
@@ -59,6 +65,21 @@ pub unsafe extern "system" fn UnityPluginUnload() {
 #[no_mangle]
 pub unsafe extern "system" fn DoGraphicsStuff() -> UnityRenderingEvent {
     do_graphics_stuff
+}
+
+//This one gets called for low level rendering events.
+#[no_mangle]
+pub unsafe extern "system" fn UnityRenderingExtEvent(
+    event: UnityRenderingExtEventType,
+    data: std::os::raw::c_void,
+) {
+    //I wonder how this works.
+}
+
+//This one gets called for low level rendering queries.
+#[no_mangle]
+pub unsafe extern "system" fn UnityRenderingExtQuery(query: UnityRenderingExtQueryType) {
+    //do something!
 }
 
 unsafe extern "system" fn do_graphics_stuff(_event_id: i32) {
@@ -145,7 +166,8 @@ fn register_test_interface(unity: IUnityInterfaces) {
         let result_ptr = get_interface_fn(test_guid);
         println!("result_ptr: {:p}", result_ptr);
     }
-    
+
     //Alright, my assumption holds. We get back whatever we pass in, which is cool.
-    //I wonder how interface creation would look like in Rust.
+    //I wonder how interface creation would look like in Rust. Also, what about C compat?
+    //That's like extra work. Yeah, maybe at some later point if I care.
 }
