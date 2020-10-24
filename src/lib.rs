@@ -1,6 +1,6 @@
 use unity3d_sys::unity_graphics::{IUnityGraphics, UnityGfxDeviceEventType, UnityRenderingEvent};
 use unity3d_sys::unity_graphics_d3d11::IUnityGraphicsD3D11;
-use unity3d_sys::unity_interface::{IUnityInterfaces, Interface};
+use unity3d_sys::unity_interface::{IUnityInterface, IUnityInterfaces, UnityInterfaceGUID};
 use unity3d_sys::unity_xr_trace::{IUnityXRTrace, XRLogType};
 use unity3d_sys::winapi::um::d3d11::{ID3D11DeviceContext, ID3D11RenderTargetView, D3D11_VIEWPORT};
 
@@ -28,29 +28,26 @@ pub unsafe extern "system" fn UnityPluginLoad(unity_interfaces: *const IUnityInt
         eprintln!("Current renderer: {:?}", renderer);
     }
 
-    //https://stackoverflow.com/a/27994682
-    let get_iface = (*unity_interfaces).get_interface_fn;
-
-    let xr_trace_ptr = get_iface(IUnityXRTrace::GUID);
-    if xr_trace_ptr != std::ptr::null() {
+    let xr_trace = unity.get_interface::<IUnityXRTrace>();
+    if let Some(xr_trace) = xr_trace {
         println!("Got IUnityXRTrace!");
-        //I think we could safely make this Copy since it's just a bunch of fn pointers, right?
-        let xr_trace = *(xr_trace_ptr as *const IUnityXRTrace);
-        let trace = xr_trace.trace;
+
+        let trace_fn = xr_trace.trace;
 
         let message = std::ffi::CString::new("Yo from XRTrace").expect("something exploded");
-        trace(XRLogType::kXRLogTypeLog, message.as_ptr());
+        trace_fn(XRLogType::kXRLogTypeLog, message.as_ptr());
     }
 
-    let d3d_gfx_ptr = get_iface(IUnityGraphicsD3D11::GUID);
-    if d3d_gfx_ptr != std::ptr::null() {
+    let d3d_gfx = unity.get_interface::<IUnityGraphicsD3D11>();
+    if d3d_gfx.is_some() {
         println!("Got IUnityGraphicsD3D11!");
-        let d3d_gfx = *(d3d_gfx_ptr as *const IUnityGraphicsD3D11);
 
         //so now we wanna save this so we can later use it from the callback that
         //is called when we do GL.IssuePluginEvent in C#.
-        D3D11_GFX = Some(d3d_gfx);
+        D3D11_GFX = d3d_gfx;
     }
+
+    register_test_interface(unity);
 }
 
 #[no_mangle]
@@ -126,4 +123,29 @@ unsafe extern "system" fn do_graphics_stuff(_event_id: i32) {
 unsafe extern "system" fn on_graphics_device_event(event_type: UnityGfxDeviceEventType) {
     //interestingly this gets called multiple times when we exit the editor. but it works :)
     println!("We got a graphics device event: {:?}", event_type);
+}
+
+fn register_test_interface(unity: IUnityInterfaces) {
+    //I wonder how register_interface works since there's no docs.
+    //My guess would be that there is a global instance of a struct and we pass an opaque pointer and a guid
+    //to unity. Unity then saves that and if someone asks for the same guid, we get the pointer back. Let's
+    //test that.
+    let test_guid = UnityInterfaceGUID {
+        high: 0xDDB39EF89A89D948,
+        low: 0xBF76967F17EFB177,
+    };
+    let register_fn = unity.register_interface;
+    let get_interface_fn = unity.get_interface_fn;
+    let num = 42;
+    let ptr: *const IUnityInterface = num as *const _; //this is just a hack to test what unity gives us back
+    println!("ptr: {:p}", ptr);
+
+    unsafe {
+        register_fn(test_guid, ptr);
+        let result_ptr = get_interface_fn(test_guid);
+        println!("result_ptr: {:p}", result_ptr);
+    }
+    
+    //Alright, my assumption holds. We get back whatever we pass in, which is cool.
+    //I wonder how interface creation would look like in Rust.
 }

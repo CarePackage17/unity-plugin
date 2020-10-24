@@ -1,3 +1,5 @@
+#[repr(C)]
+#[derive(Copy, Clone)]
 pub struct UnityInterfaceGUID {
     pub high: u64,
     pub low: u64,
@@ -40,6 +42,8 @@ impl IUnityInterfaces {
     // this should be safe because Unity says if the interface doesn't exist, it'll return nullptr.
     // Otherwise it'll be a valid opaque pointer.
     pub fn get_interface<T: Interface>(&self) -> Option<T> {
+        //About calling function pointers from a struct:
+        //https://stackoverflow.com/a/27994682
         let interface_ptr = unsafe { (self.get_interface_fn)(T::GUID) };
         if interface_ptr == std::ptr::null() {
             None
