@@ -1,4 +1,4 @@
-use crate::unity_interface::{Interface, UnityInterfaceGUID};
+use crate::unity_interface::UnityInterfaceGUID;
 
 #[allow(non_camel_case_types)]
 #[repr(C)]
@@ -31,11 +31,9 @@ pub struct IUnityXRTrace {
     pub trace: unsafe extern "C" fn(log_type: XRLogType, *const std::os::raw::c_char, ...),
 }
 
-impl Interface for IUnityXRTrace {
-    const GUID_HIGH: u64 = 0xC633A7C9398B4A95;
-    const GUID_LOW: u64 = 0xC225399ED5A2328F;
-    const GUID: UnityInterfaceGUID = UnityInterfaceGUID {
-        high: Self::GUID_HIGH,
-        low: Self::GUID_LOW,
-    };
-}
+pub const GUID_HIGH: u64 = 0xC633A7C9398B4A95;
+pub const GUID_LOW: u64 = 0xC225399ED5A2328F;
+pub const GUID: UnityInterfaceGUID = UnityInterfaceGUID {
+    high: GUID_HIGH,
+    low: GUID_LOW,
+};

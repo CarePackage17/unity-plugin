@@ -10,6 +10,10 @@ use unity3d_sys::{
     unity_rendering_extensions::UnityRenderingExtQueryType,
 };
 
+mod unity;
+
+use crate::unity::UnityInterfaceRegistry;
+
 //very much unsafe: https://doc.rust-lang.org/reference/items/static-items.html#mutable-statics
 //we'll assign to this in UnityPluginLoad and use it later in a rendering call.
 static mut D3D11_GFX: Option<IUnityGraphicsD3D11> = None;
@@ -18,7 +22,7 @@ static mut D3D11_GFX: Option<IUnityGraphicsD3D11> = None;
 pub unsafe extern "system" fn UnityPluginLoad(unity_interfaces: *const IUnityInterfaces) {
     println!("Heyo, I'm a rust function!");
 
-    let unity = IUnityInterfaces::from_raw(unity_interfaces);
+    let unity = UnityInterfaceRegistry::from_raw(unity_interfaces);
     let graphics = unity.get_interface::<IUnityGraphics>();
 
     if let Some(graphics) = graphics {
@@ -88,10 +92,13 @@ pub unsafe extern "system" fn UnityRenderingExtEvent(
 }
 
 //This one gets called for low level rendering queries.
-#[no_mangle]
-pub unsafe extern "system" fn UnityRenderingExtQuery(_query: UnityRenderingExtQueryType) {
-    //do something!
-}
+//Interestingly, when it is defined but its implementation is empty, Unity Editor's UI becomes completely
+//fucked up, but only on my home PC, not on my laptop. Weird af. I think they have different Windows 10 versions
+//and AMD vs nvidia GPUs. Still, wtf Unity? :D
+// #[no_mangle]
+// pub unsafe extern "system" fn UnityRenderingExtQuery(_query: UnityRenderingExtQueryType) {
+//     //do something!
+// }
 
 unsafe extern "system" fn do_graphics_stuff(_event_id: i32) {
     //We wanted this to clear only a portion of the view, but ClearRenderTargetView overwrites the whole thing.
@@ -157,7 +164,7 @@ unsafe extern "system" fn on_graphics_device_event(event_type: UnityGfxDeviceEve
     println!("We got a graphics device event: {:?}", event_type);
 }
 
-fn register_test_interface(unity: IUnityInterfaces) {
+fn register_test_interface(unity: UnityInterfaceRegistry) {
     //I wonder how register_interface works since there's no docs.
     //My guess would be that there is a global instance of a struct and we pass an opaque pointer and a guid
     //to unity. Unity then saves that and if someone asks for the same guid, we get the pointer back. Let's
@@ -166,8 +173,8 @@ fn register_test_interface(unity: IUnityInterfaces) {
         high: 0xDDB39EF89A89D948,
         low: 0xBF76967F17EFB177,
     };
-    let register_fn = unity.register_interface;
-    let get_interface_fn = unity.get_interface_fn;
+    let register_fn = unity.raw.register_interface;
+    let get_interface_fn = unity.raw.get_interface_fn;
     let num = 42;
     let ptr: *const IUnityInterface = num as *const _; //this is just a hack to test what unity gives us back
     println!("ptr: {:p}", ptr);

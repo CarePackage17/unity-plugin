@@ -1,4 +1,4 @@
-use crate::unity_interface::{Interface, UnityInterfaceGUID, UnityRenderBuffer, UnityTextureID};
+use crate::unity_interface::{UnityInterfaceGUID, UnityRenderBuffer, UnityTextureID};
 use winapi::um::d3d11::ID3D11Device;
 
 //interesting thing I think I could try: clearing a portion of the viewport only.
@@ -20,11 +20,9 @@ pub struct IUnityGraphicsD3D11 {
         unsafe extern "system" fn(id: UnityTextureID) -> *const std::os::raw::c_void,
 }
 
-impl Interface for IUnityGraphicsD3D11 {
-    const GUID_HIGH: u64 = 0xAAB37EF87A87D748;
-    const GUID_LOW: u64 = 0xBF76967F07EFB177;
-    const GUID: UnityInterfaceGUID = UnityInterfaceGUID {
-        high: Self::GUID_HIGH,
-        low: Self::GUID_LOW,
-    };
-}
+pub const GUID_HIGH: u64 = 0xAAB37EF87A87D748;
+pub const GUID_LOW: u64 = 0xBF76967F07EFB177;
+pub const GUID: UnityInterfaceGUID = UnityInterfaceGUID {
+    high: GUID_HIGH,
+    low: GUID_LOW,
+};
