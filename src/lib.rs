@@ -1,13 +1,10 @@
+use unity3d_sys::unity_graphics_d3d11::IUnityGraphicsD3D11;
 use unity3d_sys::unity_interface::{IUnityInterface, IUnityInterfaces, UnityInterfaceGUID};
 use unity3d_sys::unity_xr_trace::{IUnityXRTrace, XRLogType};
 use unity3d_sys::winapi::um::d3d11::{ID3D11DeviceContext, ID3D11RenderTargetView, D3D11_VIEWPORT};
 use unity3d_sys::{
     unity_graphics::{IUnityGraphics, UnityGfxDeviceEventType, UnityRenderingEvent},
     unity_rendering_extensions::UnityRenderingExtEventType,
-};
-use unity3d_sys::{
-    unity_graphics_d3d11::IUnityGraphicsD3D11,
-    unity_rendering_extensions::UnityRenderingExtQueryType,
 };
 
 mod unity;
@@ -95,6 +92,8 @@ pub unsafe extern "system" fn UnityRenderingExtEvent(
 //Interestingly, when it is defined but its implementation is empty, Unity Editor's UI becomes completely
 //fucked up, but only on my home PC, not on my laptop. Weird af. I think they have different Windows 10 versions
 //and AMD vs nvidia GPUs. Still, wtf Unity? :D
+//Maybe it's working as intended because when we get a query we're supposed to do something that Unity skips because it thinks we're doing it.
+//If we don't do shit, things break. Sounds plausible. Still funny :D
 // #[no_mangle]
 // pub unsafe extern "system" fn UnityRenderingExtQuery(_query: UnityRenderingExtQueryType) {
 //     //do something!
